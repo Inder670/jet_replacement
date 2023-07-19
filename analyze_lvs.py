@@ -121,7 +121,7 @@ def gen_json(project_dir, cfg_loc, def_loc):
             "def": f"{def_loc}",
         }}
         dgui_json.update(data)
-        with open(json_loc, 'a') as file:
+        with open(json_loc, 'w') as file:
             json.dump(dgui_json, file, indent=4)
 
 if __name__ == "__main__":
