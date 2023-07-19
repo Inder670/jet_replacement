@@ -58,9 +58,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER END")
 
     cfg_file_path = os.path.join(cfg_file_dir, 'project_dir.cfg')
-    print("AHOO")
     if not os.path.exists(cfg_file_path):
-        print("UETG")
         with open(cfg_file_path, "w") as cfg_file:
             cfg_file.write("\n".join(cfg_lines))
 

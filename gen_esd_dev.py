@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import subprocess
@@ -8,8 +9,9 @@ import argparse
 parser = argparse.ArgumentParser(description='Example argument parser')
 
 # Add arguments
-parser.add_argument('input' ,type=str, help='First argument')
-parser.add_argument('output' ,type=str, help='Second argument')
+parser.add_argument('-i', type=str, help='input file(def file)')
+parser.add_argument('-o', type=str, help='output directory')
+parser.add_argument('-p', type=str, help='project directory')
 
 # Parse the command-line arguments
 args = parser.parse_args()
@@ -40,10 +42,25 @@ def generate_cfg():
 
     return cfg_lines
 
-def save_cfg(cfg_lines, filename):
-    with open(filename, "w") as cfg_file:
-        cfg_file.write("\n".join(cfg_lines))
+def save_cfg(project_dir):
+    project_dir = project_dir.strip('\n')
+    cfg_file_dir = os.path.join(project_dir, '.dgui', 'config_files')
+    if not os.path.exists(cfg_file_dir):
+        os.makedirs(cfg_file_dir)
+    cfg_lines = []
+    cfg_lines.append("HEADER START")
+    cfg_lines.append("VARIABLES")
+    cfg_lines.append("TITLE:: Genearte Tech Files")
+    cfg_lines.append(f"GLAUNCH:: gen_tech_files {os.path.join(os.path.dirname(sys.argv[0]), 'gen_tech_files')} 1")
+    cfg_lines.append("$esd_dev-and-tech_files::$cci directory file::$Input_File::$Dir")
+    cfg_lines.append("HEADER END")
 
+    cfg_file_path = os.path.join(cfg_file_dir, 'gen_esd_dev.cfg')
+
+    if not os.path.exists(cfg_file_path):
+        with open(cfg_file_path, "w") as cfg_file:
+            cfg_file.write("\n".join(cfg_lines))
+    return cfg_file_path
 def generate_txt_file(file_list):
     txt_lines = []
     for index, file in enumerate(file_list, start=1):
@@ -55,43 +72,59 @@ def save_txt_file(txt_lines, filename):
     with open(filename, "w") as txt_file:
         txt_file.write("\n".join(txt_lines))
 
-def save_def(input):
-    config_files_path = os.path.join(os.path.dirname(sys.argv[0]), "def_files")
+def save_def(input, path):
+    path = path.strip('\n')
+    def_files_path = os.path.join(path, '.dgui', "def_files")
 
-    if not os.path.exists(config_files_path):
-        os.mkdir(config_files_path)
+    if not os.path.exists(def_files_path):
+        os.makedirs(def_files_path)
 
-    new_loc = os.path.join(config_files_path, 'gen_esd_dev.txt')
+    new_loc = os.path.join(def_files_path, 'gen_esd_dev.txt')
     try:
         shutil.copy2(input, new_loc)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occured: {e}")
 
     return new_loc
 
+def gen_json(project_dir, cfg_loc, def_loc):
+    json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
+    current_step = "gen_esd_dev"
+
+    if os.path.exists(json_loc) and os.path.getsize(json_loc) > 0:
+        with open(json_loc, 'r') as file:
+            try:
+                dgui_json = json.load(file)
+            except json.JSONDecodeError:
+                # Handle the case when the file contains invalid JSON data
+                print(f"Invalid JSON data in {json_loc}.")
+                dgui_json = {}
+    else:
+        dgui_json = {}
+    print("ABC")
+    if current_step in dgui_json:
+        print("already there")
+    else:
+        data = {'gen_esd_dev': {
+            "cfg": f"{cfg_loc}",
+            "def": f"{def_loc}",
+        }}
+        dgui_json.update(data)
+        with open(json_loc, 'w') as file:
+            json.dump(dgui_json, file, indent=4)
+
 if __name__ == "__main__":
-
     # Prompt the user to enter a directory path
-    input_file = args.input
-
-    # Copy default file to project structure
-    def_path = save_def(input_file)
-    os.remove(input_file)
-    # Search for files in the specified directory (including subdirectories)
-    path = ''
-    # Generate the cfg lines
-    cfg_lines = generate_cfg()
+    input_file = args.i
+    project_dir = args.p
+    def_path = save_def(input_file, project_dir)
 
     # Save the cfg file
-    # cfg_filename = os.path.abspath(args.output)
-    cfg_filename = "esd_tech.cfg"
-
-    save_cfg(cfg_lines, cfg_filename)
-
+    cfg_file_path = save_cfg(project_dir)
+    gen_json(project_dir,cfg_file_path,def_path)
     # Generate the txt file content
-    print(f"Generated {len(cfg_lines)} cfg lines. Saved as {cfg_filename}.")
 
-    command = f"dgui -c {cfg_filename} -g  -dir ./ -j ./ --splash"
+    command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
 
     print("Launching DGUI...")
     print(command)
