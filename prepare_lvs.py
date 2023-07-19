@@ -1,5 +1,4 @@
 import os
-import shutil
 import subprocess
 import sys
 import argparse
@@ -54,28 +53,12 @@ def generate_txt_file(file_list):
 def save_txt_file(txt_lines, filename):
     with open(filename, "w") as txt_file:
         txt_file.write("\n".join(txt_lines))
-def save_def(input):
-    config_files_path = os.path.join(os.path.dirname(sys.argv[0]), "def_files")
-
-    if not os.path.exists(config_files_path):
-        os.mkdir(config_files_path)
-
-    new_loc = os.path.join(config_files_path, 'prepare_lvs.txt')
-    try:
-        shutil.copy2(input, new_loc)
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-    return new_loc
 
 if __name__ == "__main__":
-
     # Prompt the user to enter a directory path
-    input_file = args.input
+    directory = args.input
 
-    # Copy default file to project structure
-    def_path = save_def(input_file)
-    os.remove(input_file)
+
     # Search for files in the specified directory (including subdirectories)
     path = ''
     # Generate the cfg lines
