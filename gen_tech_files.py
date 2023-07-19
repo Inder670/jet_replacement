@@ -103,8 +103,7 @@ if __name__ == "__main__":
     input_file = args.i
     project_dir = args.p
     def_path = save_def(input_file, project_dir)
-    # Search for files in the specified directory (including subdirectories)
-    path = ''
+    os.remove(input_file)
     # Generate the cfg lines
     cfg_file_path = save_cfg(project_dir)
     gen_json(project_dir, cfg_file_path, def_path)

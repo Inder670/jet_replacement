@@ -120,7 +120,7 @@ if __name__ == "__main__":
     input_file = args.i
     project_dir = args.p
     def_path = save_def(input_file, project_dir)
-    # os.remove(input_file)
+    os.remove(input_file)
 
     cfg_file_path = save_cfg(project_dir)
     gen_json(project_dir, cfg_file_path, def_path)

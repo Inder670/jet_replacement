@@ -132,7 +132,7 @@ if __name__ == "__main__":
     print(project_dir)
     # Copy default file to project structure
     def_path = save_def(input_file,project_dir)
-    # os.remove(input_file)
+    os.remove(input_file)
     # cfg_filename = os.path.abspath(args.output)
 
     cfg_file_path = save_cfg(project_dir)

@@ -111,7 +111,7 @@ if __name__ == "__main__":
     project_dir = find_project_dir(input_file).strip('\n')
     # Copy default file to project structure
     def_path = save_def(input_file, project_dir)
-    # os.remove(input_file)
+    os.remove(input_file)
 
     cfg_file_path = save_cfg(project_dir)
     gen_json(project_dir, cfg_file_path, def_path)
