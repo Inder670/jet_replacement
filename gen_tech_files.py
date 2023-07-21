@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 parser.add_argument('-i', type=str, help='input file(def file)')
 parser.add_argument('-o', type=str, help='output directory')
 parser.add_argument('-p', type=str, help='project directory')
+parser.add_argument('-b', help='Launch previous gui flag', action='store_true')
 
 # Parse the command-line arguments
 args = parser.parse_args()
@@ -33,13 +34,14 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Generate esd files")
+    cfg_lines.append(f"BACK::Generate-Tech-Files  {os.path.join(os.path.dirname(sys.argv[0]), 'gen_esd_files')} 1")
     cfg_lines.append(f"GLAUNCH:: generate_esd_files {os.path.join(os.path.dirname(sys.argv[0]),'gen_esd_files')} 1")
     cfg_lines.append("$Esd* Files::$APD File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$Ploc File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$sp File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$generation method::$String::$gds+apd gds_only  Resistive-Package-Model Package-Layout other")
     cfg_lines.append("HEADER END")
-    cfg_file_path = os.path.join(cfg_file_dir, 'gen_tech_files.cfg')
+    cfg_file_path = os.path.join(cfg_file_dir, 'gen_esd_files.cfg')
 
     if not os.path.exists(cfg_file_path):
         with open(cfg_file_path, "w") as cfg_file:
@@ -72,7 +74,7 @@ def save_def(input, path):
 
 def gen_json(project_dir, cfg_loc, def_loc):
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
-    current_step = "gen_tech_files"
+    current_step = "gen_esd_files"
 
     if os.path.exists(json_loc) and os.path.getsize(json_loc) > 0:
         with open(json_loc, 'r') as file:
@@ -88,26 +90,19 @@ def gen_json(project_dir, cfg_loc, def_loc):
     if current_step in dgui_json:
         print("already there")
     else:
-        data = {'gen_tech_files': {
+        data = {'gen_esd_files': {
             "cfg": f"{cfg_loc}",
             "def": f"{def_loc}",
         }}
+
         dgui_json.update(data)
         with open(json_loc, 'w') as file:
             json.dump(dgui_json, file, indent=4)
 
 
-if __name__ == "__main__":
-
-    # Prompt the user to enter a directory path
-    input_file = args.i
-    project_dir = args.p
-    def_path = save_def(input_file, project_dir)
-    os.remove(input_file)
-    # Generate the cfg lines
+def mainforward(project_dir, def_path):
     cfg_file_path = save_cfg(project_dir)
     gen_json(project_dir, cfg_file_path, def_path)
-    # Generate the txt file content
 
     command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
 
@@ -116,6 +111,32 @@ if __name__ == "__main__":
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     for line in iter(process.stdout.readline, b''):
         print(line.decode('utf-8').strip())
-    process.wait()
     # os.system(command)
     sys.exit(0)
+
+
+def mainback(project_dir):
+    json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
+    with open(json_loc, 'r') as file:
+        data = json.load(file)
+        for key in data:
+            print(f"key: {key}, Value: {data[key]}")
+
+        command = f"dgui -c {data['gen_esd_dev']['cfg']} -g  -dir ./ -j ./ --splash -p {project_dir} -d {data['gen_tech_files']['def']}"
+        print(command)
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        for line in iter(process.stdout.readline, b''):
+            print(line.decode('utf-8').strip())
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    # Prompt the user to enter a directory path
+    input_file = args.i
+    project_dir = args.p
+    def_path = save_def(input_file, project_dir)
+    # os.remove(input_file)
+    if args.b:
+        mainback(project_dir)
+    else:
+        mainforward(project_dir, def_path)

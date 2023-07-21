@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 parser.add_argument('-i', type=str, help='input file(def file)')
 parser.add_argument('-o', type=str, help='output directory')
 parser.add_argument('-p', type=str, help='project directory')
+parser.add_argument('-b', help='Launch previous gui flag', action='store_true')
 
 # Parse the command-line arguments
 args = parser.parse_args()
@@ -57,7 +58,7 @@ def save_cfg(project_dir):
     cfg_lines.append("$lvs_setup::$sourceme file::$Input_File::$File")
     cfg_lines.append("HEADER END")
 
-    cfg_file_path = os.path.join(cfg_file_dir, 'project_dir.cfg')
+    cfg_file_path = os.path.join(cfg_file_dir, 'analyze_lvs.cfg')
     if not os.path.exists(cfg_file_path):
         with open(cfg_file_path, "w") as cfg_file:
             cfg_file.write("\n".join(cfg_lines))
@@ -79,7 +80,7 @@ def find_project_dir(input_file):
 
 def gen_json(project_dir, cfg_loc, def_loc):
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
-    current_step = "project_dir"
+    current_step = "analyze_lvs"
 
     if os.path.exists(json_loc) and os.path.getsize(json_loc) > 0:
         with open(json_loc, 'r') as file:
@@ -95,7 +96,7 @@ def gen_json(project_dir, cfg_loc, def_loc):
     if current_step in dgui_json:
         print("already there")
     else:
-        data = {'project_dir': {
+        data = {'analyze_lvs': {
             "cfg": f"{cfg_loc}",
             "def": f"{def_loc}",
         }}
@@ -103,15 +104,10 @@ def gen_json(project_dir, cfg_loc, def_loc):
         with open(json_loc, 'w') as file:
             json.dump(dgui_json, file, indent=4)
 
-
-if __name__ == "__main__":
+def mainforward(args):
 
     # Prompt the user to enter a directory path
-    input_file = args.i
-    project_dir = find_project_dir(input_file).strip('\n')
-    # Copy default file to project structure
-    def_path = save_def(input_file, project_dir)
-    os.remove(input_file)
+
 
     cfg_file_path = save_cfg(project_dir)
     gen_json(project_dir, cfg_file_path, def_path)
@@ -123,6 +119,20 @@ if __name__ == "__main__":
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     for line in iter(process.stdout.readline, b''):
         print(line.decode('utf-8').strip())
-    process.wait()
     # os.system(command)
     sys.exit(0)
+
+def mainback():
+    pass
+
+if __name__ == "__main__":
+    input_file = args.i
+    project_dir = find_project_dir(input_file).strip('\n')
+    # Copy default file to project structure
+    def_path = save_def(input_file, project_dir)
+    os.remove(input_file)
+    if args.b:
+        mainback()
+    else:
+        print('B is not true')
+        mainforward(args)
