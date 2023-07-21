@@ -89,8 +89,7 @@ def save_def(input, path):
     return new_loc
 
 
-def gen_json(project_dir, cfg_loc, def_loc):
-    json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
+def gen_json(json_loc,project_dir, cfg_loc, def_loc):
     current_step = "prepare_cci"
 
     if os.path.exists(json_loc) and os.path.getsize(json_loc) > 0:
@@ -114,13 +113,25 @@ def gen_json(project_dir, cfg_loc, def_loc):
         dgui_json.update(data)
         with open(json_loc, 'w') as file:
             json.dump(dgui_json, file, indent=4)
-
-
+def check_json(json_loc):
+    with open(json_loc,'r') as file:
+        data = json.load(file)
+        if "gen_esd_dev" in data:
+            path_to_def = data['gen_esd_dev']['def']
+            return path_to_def
+        else:
+            return None
 def mainforward(project_dir, def_path):
     cfg_file_path = save_cfg(project_dir)
-    gen_json(project_dir, cfg_file_path, def_path)
+    json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
+    gen_json(json_loc,project_dir, cfg_file_path, def_path)
+    check_json_for_existing_def = check_json(json_loc)
+    if check_json_for_existing_def is not None:
+        def_file = f"-d {check_json_for_existing_def}"
+    else:
+        def_file = ''
 
-    command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
+    command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir} {def_file}"
 
     print("Launching DGUI...")
     print(command)
