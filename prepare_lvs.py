@@ -89,9 +89,7 @@ def save_def(input, path):
     return new_loc
 
 
-def gen_json(json_loc,project_dir, cfg_loc, def_loc):
-    current_step = "prepare_cci"
-
+def gen_json(json_loc, project_dir, cfg_loc, def_loc):
     if os.path.exists(json_loc) and os.path.getsize(json_loc) > 0:
         with open(json_loc, 'r') as file:
             try:
@@ -103,28 +101,22 @@ def gen_json(json_loc,project_dir, cfg_loc, def_loc):
     else:
         dgui_json = {}
 
-    if current_step in dgui_json:
-        print("already there")
-    else:
-        data = {'prepare_cci': {
-            "cfg": f"{cfg_loc}",
-            "def": f"{def_loc}",
-        }}
-        dgui_json.update(data)
-        with open(json_loc, 'w') as file:
-            json.dump(dgui_json, file, indent=4)
+    dgui_json['Prepare-LVS']['def'] = def_loc
+    if dgui_json['Prepare-CCI'] is None:
+        cfg_data = {'cfg': f"{cfg_loc}"}
+        dgui_json["Prepare-CCI"] = cfg_data
+    with open(json_loc, 'w') as file:
+        json.dump(dgui_json, file, indent=4)
 def check_json(json_loc):
-    with open(json_loc,'r') as file:
+    with open(json_loc, 'r') as file:
         data = json.load(file)
-        if "gen_esd_dev" in data:
-            path_to_def = data['gen_esd_dev']['def']
-            return path_to_def
+        if "Prepare-CCI" in data:
+            if 'def' in data['Prepare-CCI']:
+                path_to_def = data['Prepare-CCI']['def']
+                return path_to_def
         else:
             return None
 def mainforward(project_dir, def_path):
-    cfg_file_path = save_cfg(project_dir)
-    json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
-    gen_json(json_loc,project_dir, cfg_file_path, def_path)
     check_json_for_existing_def = check_json(json_loc)
     if check_json_for_existing_def is not None:
         def_file = f"-d {check_json_for_existing_def}"
@@ -149,7 +141,7 @@ def mainback(project_dir):
         for key in data:
             print(f"key: {key}, Value: {data[key]}")
 
-        command = f"dgui -c {data['analyze_lvs']['cfg']} -g  -dir ./ -j ./ --splash -p {project_dir} -d {data['prepare_lvs']['def']}"
+        command = f"dgui -c {data['Analyze-LVS']['cfg']} -g  -dir ./ -j ./ --splash -p {project_dir} -d {data['Analyze-LVS']['def']}"
         print(command)
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         for line in iter(process.stdout.readline, b''):
@@ -162,6 +154,9 @@ if __name__ == "__main__":
     input_file = args.i
     project_dir = args.p
     def_path = save_def(input_file, project_dir)
+    json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
+    cfg_file_path = save_cfg(project_dir)
+    gen_json(json_loc,project_dir, cfg_file_path, def_path)
     # os.remove(input_file)
     if args.b:
         mainback(project_dir)

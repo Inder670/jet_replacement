@@ -96,10 +96,7 @@ def save_def(input, path):
     return new_loc
 
 
-def gen_json(project_dir, cfg_loc, def_loc):
-    json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
-    current_step = "gen_tech_files"
-
+def gen_json(json_loc, project_dir, cfg_loc, def_loc):
     if os.path.exists(json_loc) and os.path.getsize(json_loc) > 0:
         with open(json_loc, 'r') as file:
             try:
@@ -110,24 +107,32 @@ def gen_json(project_dir, cfg_loc, def_loc):
                 dgui_json = {}
     else:
         dgui_json = {}
-    print("ABC")
-    if current_step in dgui_json:
-        print("already there")
-    else:
-        data = {'gen_tech_files': {
-            "cfg": f"{cfg_loc}",
-            "def": f"{def_loc}",
-        }}
-        dgui_json.update(data)
-        with open(json_loc, 'w') as file:
-            json.dump(dgui_json, file, indent=4)
 
+    dgui_json['Generate-esd_dev']['def'] = def_loc
+    if dgui_json['Generate-Tech-Files'] is None:
+        cfg_data = {'cfg': f"{cfg_loc}"}
+        dgui_json["Generate-Tech-Files"] = cfg_data
+    with open(json_loc, 'w') as file:
+        json.dump(dgui_json, file, indent=4)
+def check_json(json_loc):
+    with open(json_loc, 'r') as file:
+        data = json.load(file)
+        if "Generate-Tech-Files" in data:
+            if 'def' in data['Generate-Tech-Files']:
+                path_to_def = data['Generate-Tech-Files']['def']
+                return path_to_def
+        else:
+            return None
 
 def mainforward(project_dir, def_path):
-    cfg_file_path = save_cfg(project_dir)
-    gen_json(project_dir, cfg_file_path, def_path)
 
-    command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
+    check_json_for_existing_def = check_json(json_loc)
+    if check_json_for_existing_def is not None:
+        def_file = f"-d {check_json_for_existing_def}"
+    else:
+        def_file = ''
+
+    command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir} {def_file}"
 
     print("Launching DGUI...")
     print(command)
@@ -145,7 +150,7 @@ def mainback(project_dir):
         for key in data:
             print(f"key: {key}, Value: {data[key]}")
 
-        command = f"dgui -c {data['prepare_cci']['cfg']} -g  -dir ./ -j ./ --splash -p {project_dir} -d {data['gen_esd_dev']['def']}"
+        command = f"dgui -c {data['Prepare-CCI']['cfg']} -g  -dir ./ -j ./ --splash -p {project_dir} -d {data['Prepare-CCI']['def']}"
         print(command)
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
         for line in iter(process.stdout.readline, b''):
@@ -158,6 +163,10 @@ if __name__ == "__main__":
     input_file = args.i
     project_dir = args.p
     def_path = save_def(input_file, project_dir)
+    json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
+
+    cfg_file_path = save_cfg(project_dir)
+    gen_json(json_loc, project_dir, cfg_file_path, def_path)
     # os.remove(input_file)
     if args.b:
         mainback(project_dir)
