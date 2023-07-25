@@ -95,6 +95,20 @@ def gen_json(json_loc, project_dir, cfg_loc, def_loc):
         with open(json_loc, 'r') as file:
             try:
                 dgui_json = json.load(file)
+                if args.b:
+                    for key in dgui_json:
+                        if key != 'Generate-Tech-Files':
+                            dgui_json[key]['current_step'] = 0
+                        else:
+                            dgui_json[key]['current_step'] = 1
+                else:
+                    pass
+                    #
+                    # for key in dgui_json:
+                    #     if key != 'Prepare-LVS':
+                    #         dgui_json[key]['current_step'] = 0
+                    #     else:
+                    #         dgui_json[key]['current_step'] = 1
             except json.JSONDecodeError:
                 # Handle the case when the file contains invalid JSON data
                 print(f"Invalid JSON data in {json_loc}.")
@@ -104,6 +118,7 @@ def gen_json(json_loc, project_dir, cfg_loc, def_loc):
 
     dgui_json['Generate-ESD-Files']['def'] = def_loc
     print(dgui_json['Generate-ESD-Files'])
+
     # if dgui_json['Prepare-CCI'] is None:
     #     cfg_data = {'cfg': f"{cfg_loc}"}
     #     dgui_json["Prepare-CCI"] = cfg_data

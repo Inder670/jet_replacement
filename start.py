@@ -95,17 +95,25 @@ def gen_json(json_loc,project_dir, cfg_loc, def_loc):
         pass
     else:
         data = {
-            'Project-Dir':{
-                'def': f'{def_loc}'
-            },
             'Analyze-LVS':{
-                'cfg':f'{cfg_loc}'
+                'cfg':f'{cfg_loc}',
+                'current_step': 1
             },
-            'Prepare-LVS':None,
-            'Prepare-CCI':None,
-            'Generate-esd_dev':None,
-            'Generate-Tech-Files':None,
-            'Generate-ESD-Files':None
+            'Prepare-LVS': {
+                'current_step': 0
+            },
+            'Prepare-CCI': {
+                'current_step': 0
+            },
+            'Generate-esd_dev': {
+                'current_step': 0
+            },
+            'Generate-Tech-Files': {
+                'current_step': 0
+            },
+            'Generate-ESD-Files': {
+                'current_step': 0
+            }
         }
 
         dgui_json.update(data)
