@@ -132,15 +132,29 @@ def check_json(json_loc):
             return None
 
 
-def mainforward(def_path, project_dir):
+def mainforward(def_path, project_dir, json_loc, cfg_file_path):
 
     check_json_for_existing_def = check_json(json_loc)
-    if check_json_for_existing_def is not None:
-        def_file = f"-d {check_json_for_existing_def}"
-    else:
-        def_file = ''
+    # if check_json_for_existing_def is not None:
+    #     def_file = f"-d {check_json_for_existing_def}"
+    # else:
+    #     def_file = ''
 
-    command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir} {def_file}"
+    if os.path.exists(json_loc):
+        with open(json_loc, 'r') as file:
+            data =json.load(file)
+            for key in data:
+                if data[key]['current_step'] == 1:
+                    cfg_file_path = data[key]['cfg']
+                    if 'def' in data[key]:
+                        def_file = f"-d {data[key]['def']}"
+                    else:
+                        def_file = ''
+
+                    command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir} {def_file}"
+    else:
+
+        command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
 
     print("Launching DGUI...")
     print(command)
@@ -169,4 +183,4 @@ if __name__ == "__main__":
         mainback()
     else:
         print('B is not true')
-        mainforward(def_path, project_dir)
+        mainforward(def_path, project_dir,json_loc,cfg_file_path)
