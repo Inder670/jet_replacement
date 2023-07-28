@@ -124,7 +124,8 @@ def gen_json(json_loc, project_dir, cfg_loc, def_loc):
     dgui_json['Generate-esd_dev']['def'] = def_loc
     if not 'cfg' in dgui_json['Generate-Tech-Files']:
         cfg_data = f"{cfg_loc}"
-        dgui_json["Generate-Tech-Files"]['cfg'] = cfg_data
+        if not args.b:
+            dgui_json["Generate-Tech-Files"]['cfg'] = cfg_data
     with open(json_loc, 'w') as file:
         json.dump(dgui_json, file, indent=4)
 def check_json(json_loc):

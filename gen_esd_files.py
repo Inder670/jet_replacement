@@ -102,26 +102,27 @@ def gen_json(json_loc, project_dir, cfg_loc, def_loc):
                         else:
                             dgui_json[key]['current_step'] = 1
                 else:
-                    pass
-                    #
-                    # for key in dgui_json:
-                    #     if key != 'Prepare-LVS':
-                    #         dgui_json[key]['current_step'] = 0
-                    #     else:
-                    #         dgui_json[key]['current_step'] = 1
+
+                    for key in dgui_json:
+                        if key != 'Prepare-ESRA':
+                            dgui_json[key]['current_step'] = 0
+                        else:
+                            dgui_json[key]['current_step'] = 1
             except json.JSONDecodeError:
                 # Handle the case when the file contains invalid JSON data
                 print(f"Invalid JSON data in {json_loc}.")
                 dgui_json = {}
+
     else:
         dgui_json = {}
 
     dgui_json['Generate-ESD-Files']['def'] = def_loc
     print(dgui_json['Generate-ESD-Files'])
 
-    # if dgui_json['Prepare-CCI'] is None:
-    #     cfg_data = {'cfg': f"{cfg_loc}"}
-    #     dgui_json["Prepare-CCI"] = cfg_data
+    if not 'cfg' in dgui_json['Prepare-ESRA']:
+        cfg_data = f"{cfg_loc}"
+        if not args.b:
+            dgui_json["Prepare-ESRA"]['cfg'] = cfg_data
     with open(json_loc, 'w') as file:
         json.dump(dgui_json, file, indent=4)
 
@@ -136,6 +137,11 @@ def check_json(json_loc):
             return None
 def mainforward(project_dir, def_path):
     cfg_file_path = save_cfg(project_dir)
+    check_json_for_existing_def = check_json(json_loc)
+    if check_json_for_existing_def is not None:
+        def_file = f"-d {check_json_for_existing_def}"
+    else:
+        def_file = ''
     command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
 
     print("Launching DGUI...")

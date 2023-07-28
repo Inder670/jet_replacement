@@ -113,6 +113,9 @@ def gen_json(json_loc,project_dir, cfg_loc, def_loc):
             },
             'Generate-ESD-Files': {
                 'current_step': 0
+            },
+            "Prepare-ESRA": {
+                'current_step': 0
             }
         }
 

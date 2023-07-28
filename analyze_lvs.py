@@ -135,7 +135,8 @@ def gen_json(json_loc, project_dir, cfg_loc, def_loc):
     dgui_json['Analyze-LVS']['def'] = def_loc
     if not 'cfg' in dgui_json['Prepare-LVS']:
         cfg_data = f"{cfg_loc}"
-        dgui_json["Prepare-LVS"]['cfg'] = cfg_data
+        if not args.b:
+            dgui_json["Prepare-LVS"]['cfg'] = cfg_data
 
     with open(json_loc, 'w') as file:
         json.dump(dgui_json, file, indent=4)
