@@ -43,6 +43,7 @@ def save_def(input, path):
 
 
 def save_cfg(project_dir):
+
     project_dir = project_dir.strip('\n')
     cfg_file_dir = os.path.join(project_dir, '.dgui', 'config_files')
     if not os.path.exists(cfg_file_dir):
@@ -67,6 +68,7 @@ def save_cfg(project_dir):
 
 
 def find_project_dir(input_file):
+    path = ''
     with open(input_file, 'r') as file:
         for line in file:
             print(line)
@@ -75,6 +77,10 @@ def find_project_dir(input_file):
                 path = tokens[2].strip('$')
                 print(f"Token found : {path}")
             break
+
+    if not os.path.exists(path) or path =='':
+        lock_file_error(f"Please provide valid project directory path")
+        sys.exit(1)
     return path
 
 
