@@ -161,29 +161,31 @@ def lock_file_error(message):
     msg_box.setText(message)
     msg_box.exec_()
 
+
 def lock_file(project_dir):
     lock_file_path = os.path.join(project_dir, '.dgui', 'dgui.lock')
 
     if os.path.exists(project_dir):
         if not os.path.exists(lock_file_path):
-            print("LOCK FILE DOES NOT EXIST")
             with open(lock_file_path, 'w') as file:
                 file.write(f"owner:{os.environ.get('USER')}")
         else:
+            owner_found = False
             with open(lock_file_path, 'r') as file:
                 for line in file:
                     if line.startswith('owner'):
                         owner_name = line.split(':')[1].strip()
-                        if not os.environ.get('USER') == owner_name:
-                            lock_file_error(
-                                f"This project directory is currently being used by {os.environ.get('USER')}.")
-                            sys.exit(0)
+                        if os.environ.get('USER') == owner_name:
+                            owner_found = True
+                            break
                         else:
-                            pass
-                        break
-                else:
-                    lock_file_error("ERROR: OWNER NOT FOUND\n The lock file is corrupted.")
-                    sys.exit(0)
+                            lock_file_error(f"This directory is being used by {owner_name}\n"
+                                            f"The current user is {os.environ.get('USER')}")
+                            sys.exit(0)
+
+            if not owner_found:
+                print("You are not the owner of the file.")
+                sys.exit(0)
 
 
 
@@ -229,11 +231,11 @@ def mainback():
 if __name__ == "__main__":
     input_file = args.i
     project_dir = find_project_dir(input_file).strip('\n')
-    lock_file(project_dir)
     # Copy default file to project structure
     def_path = save_def(input_file, project_dir)
     print(project_dir)
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
+    lock_file(project_dir)
     cfg_file_path = save_cfg(project_dir)
     gen_json(json_loc, project_dir, cfg_file_path, def_path)
     save_existing_def_files(json_loc)
