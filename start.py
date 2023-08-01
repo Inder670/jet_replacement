@@ -4,7 +4,7 @@ import subprocess
 import sys
 import argparse
 import shutil
-
+from PyQt5.QtWidgets import QApplication, QMessageBox
 # Create the parser
 parser = argparse.ArgumentParser(description='Example argument parser')
 
@@ -134,6 +134,58 @@ def check_json(json_loc):
         else:
             return None
 
+def save_existing_def_files(json_loc):
+    if os.path.exists(json_loc):
+        with open(json_loc, 'r') as file:
+            data = json.load(file)
+            def_back_up = os.path.join(os.path.dirname(json_loc), 'def_back_up')
+            if not os.path.exists(def_back_up):
+                os.makedirs(def_back_up)
+
+            for key in data:
+                step = data[key]
+                if 'def' in step:
+                    if os.path.exists(step['def']):
+                        print(f"Following exists:{step['def']}")
+                        source = step['def']
+                        try:
+                            shutil.copy2(source, def_back_up)
+                        except Exception as e:
+                            print(f"An error occured: {e}")
+
+def lock_file_error(message):
+    app = QApplication(sys.argv)
+    msg_box = QMessageBox()
+    msg_box.setWindowTitle("Information")
+    msg_box.setIcon(QMessageBox.Critical)
+    msg_box.setText(message)
+    msg_box.exec_()
+
+def lock_file(project_dir):
+    lock_file_path = os.path.join(project_dir, '.dgui', 'dgui.lock')
+
+    if os.path.exists(project_dir):
+        if not os.path.exists(lock_file_path):
+            print("LOCK FILE DOES NOT EXIST")
+            with open(lock_file_path, 'w') as file:
+                file.write(f"owner:{os.environ.get('USER')}")
+        else:
+            with open(lock_file_path, 'r') as file:
+                for line in file:
+                    if line.startswith('owner'):
+                        owner_name = line.split(':')[1].strip()
+                        if not os.environ.get('USER') == owner_name:
+                            lock_file_error(
+                                f"This project directory is currently being used by {os.environ.get('USER')}.")
+                            sys.exit(0)
+                        else:
+                            pass
+                        break
+                else:
+                    lock_file_error("ERROR: OWNER NOT FOUND\n The lock file is corrupted.")
+                    sys.exit(0)
+
+
 
 def mainforward(def_path, project_dir, json_loc, cfg_file_path):
 
@@ -146,7 +198,9 @@ def mainforward(def_path, project_dir, json_loc, cfg_file_path):
     if os.path.exists(json_loc):
         with open(json_loc, 'r') as file:
             data =json.load(file)
+            print(data)
             for key in data:
+
                 if data[key]['current_step'] == 1:
                     cfg_file_path = data[key]['cfg']
                     if 'def' in data[key]:
@@ -175,12 +229,14 @@ def mainback():
 if __name__ == "__main__":
     input_file = args.i
     project_dir = find_project_dir(input_file).strip('\n')
-
+    lock_file(project_dir)
     # Copy default file to project structure
     def_path = save_def(input_file, project_dir)
+    print(project_dir)
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
     cfg_file_path = save_cfg(project_dir)
     gen_json(json_loc, project_dir, cfg_file_path, def_path)
+    save_existing_def_files(json_loc)
     # os.remove(input_file)
     if args.b:
         mainback()
