@@ -54,8 +54,8 @@ def save_cfg(project_dir):
     cfg_lines.append("TITLE:: Analyze LVS")
     cfg_lines.append(
         f"GLAUNCH:: Analyze-LVS {os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'analyze_lvs')} 1")
-    cfg_lines.append("$lvs_setup::$Calibre.run file::$Input_File::$File")
-    cfg_lines.append("$lvs_setup::$sourceme file::$Input_File::$File")
+    cfg_lines.append("$lvs_setup*::$Calibre.run file::$Input_File::$File")
+    cfg_lines.append("$lvs_setup*::$sourceme file::$Input_File::$File")
     cfg_lines.append("HEADER END")
 
     cfg_file_path = os.path.join(cfg_file_dir, 'analyze_lvs.cfg')

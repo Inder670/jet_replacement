@@ -5,6 +5,8 @@ import subprocess
 import sys
 import argparse
 
+from PyQt5.QtWidgets import QApplication, QMessageBox
+
 # Create the parser
 parser = argparse.ArgumentParser(description='Example argument parser')
 
@@ -112,8 +114,21 @@ def check_json(json_loc):
                 return path_to_def
         else:
             return None
+
+def message_box(message):
+    app = QApplication(sys.argv)
+    msg_box = QMessageBox()
+    msg_box.setWindowTitle("Information")
+    msg_box.setIcon(QMessageBox.Information)
+    msg_box.setText(message)
+    msg_box.exec_()
+
 def mainforward(project_dir, def_path):
-    pass
+    #Delete lock file
+    lock_file_path = os.path.join(project_dir, '.dgui', 'dgui.lock')
+    if os.path.exists(lock_file_path):
+        os.remove(lock_file_path)
+    message_box("You are now ready to run the ESRA Simulation")
     # cfg_file_path = save_cfg(project_dir)
     # command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
     #

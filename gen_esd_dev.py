@@ -35,7 +35,7 @@ def save_cfg(project_dir):
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Genearte Tech Files")
     cfg_lines.append(f"GLAUNCH:: gen_tech_files {os.path.join(os.path.dirname(sys.argv[0]), 'gen_tech_files')} 1")
-    cfg_lines.append("$esd_dev-and-tech_files::$cci directory file::$Input_File::$Dir")
+    cfg_lines.append("$esd_dev-and-tech_files*::$cci directory file::$Input_File::$Dir")
     cfg_lines.append("HEADER END")
 
     cfg_file_path = os.path.join(cfg_file_dir, 'gen_tech_files.cfg')

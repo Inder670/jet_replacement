@@ -35,7 +35,7 @@ def save_cfg(project_dir):
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Prepare cci")
     cfg_lines.append(f"GLAUNCH:: prepare_cci {os.path.join(os.path.dirname(sys.argv[0]), 'prepare_cci')} 1")
-    cfg_lines.append("$svdb_directory::$svdb_directory::$Input_File::$Dir")
+    cfg_lines.append("$Files*::$svdb_directory::$Input_File::$Dir")
     cfg_lines.append("HEADER END")
 
     cfg_file_path = os.path.join(cfg_file_dir, 'prepare_cci.cfg')
