@@ -5,6 +5,8 @@ import sys
 import argparse
 import shutil
 from PyQt5.QtWidgets import QApplication, QMessageBox
+
+from utilities.utils import *
 # Create the parser
 parser = argparse.ArgumentParser(description='Example argument parser')
 
@@ -44,6 +46,7 @@ def save_def(input, path):
 
 def save_cfg(project_dir):
 
+
     project_dir = project_dir.strip('\n')
     cfg_file_dir = os.path.join(project_dir, '.dgui', 'config_files')
     if not os.path.exists(cfg_file_dir):
@@ -60,6 +63,7 @@ def save_cfg(project_dir):
 
     cfg_file_path = os.path.join(cfg_file_dir, 'analyze_lvs.cfg')
     if not os.path.exists(cfg_file_path):
+        msg_center.append(f"cfg saved: analyze_lvs.cfg")
         with open(cfg_file_path, "w") as cfg_file:
             cfg_file.write("\n".join(cfg_lines))
 
@@ -168,7 +172,6 @@ def message_box(message):
 
 def lock_file(project_dir):
     lock_file_path = os.path.join(project_dir, '.dgui', 'dgui.lock')
-    msg_center.append("HFKLSDFHJIOSDFH")
     if os.path.exists(project_dir):
         if not os.path.exists(lock_file_path):
             with open(lock_file_path, 'w') as file:
@@ -191,14 +194,9 @@ def lock_file(project_dir):
                 print("lock file corrupted, no owner found.")
                 sys.exit(1)
 
-def save_message_center(project_dir):
-    with open(os.path.join(project_dir, '.dgui', 'dgui_message_center.txt'), 'w') as file:
-        for line in msg_center:
-            file.write(f"{line}\n")
-            print(line)
+
 
 def mainforward(def_path, project_dir, json_loc, cfg_file_path):
-
     check_json_for_existing_def = check_json(json_loc)
     # if check_json_for_existing_def is not None:
     #     def_file = f"-d {check_json_for_existing_def}"
@@ -221,7 +219,7 @@ def mainforward(def_path, project_dir, json_loc, cfg_file_path):
     else:
 
         command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
-    save_message_center(project_dir)
+    save_message_center(project_dir,msg_center)
     print("Launching DGUI...")
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     stdout, stderr = process.communicate()
@@ -254,35 +252,19 @@ def check_permissions():
 
         sys.exit(1)
 
+
+
+
 def mainback():
     pass
 
-def check_existing_message_center(project_dir):
-    dgui_dir = os.path.join(project_dir, '.dgui')
-    dgui_dir_exists = os.path.exists(dgui_dir)
-    messages = []
-    if not dgui_dir_exists:
-        os.makedirs(dgui_dir)
-    msg_center_path = os.path.join(dgui_dir, 'dgui_message_center.txt')
-    msg_cntr_exists = os.path.exists(msg_center_path)
-    print(os.path.join(dgui_dir, 'dgui_message_center.txt'))
-    if not msg_cntr_exists:
-        with open(msg_center_path,'w') as file:
-            file.write('.dgui directory created')
-        return ['.dgui directory created']
-    else:
-        with open(msg_center_path, 'r') as file:
-            print(type(file))
-            for line in file:
-                messages.append(line)
-            return messages
 
 
 if __name__ == "__main__":
     input_file = args.i
     project_dir = find_project_dir(input_file).strip('\n')
-    check_permissions()
     msg_center = check_existing_message_center(project_dir)
+    check_permissions()
     # Copy default file to project structure
     def_path = save_def(input_file, project_dir)
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')

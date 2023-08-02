@@ -5,6 +5,7 @@ import subprocess
 import sys
 import argparse
 
+from utilities.utils import *
 # Create the parser
 parser = argparse.ArgumentParser(description='Example argument parser')
 
@@ -41,6 +42,7 @@ def save_cfg(project_dir):
     cfg_file_path = os.path.join(cfg_file_dir, 'gen_tech_files.cfg')
 
     if not os.path.exists(cfg_file_path):
+        msg_center.append(f"cfg saved: gen_tech_files.cfg")
         with open(cfg_file_path, "w") as cfg_file:
             cfg_file.write("\n".join(cfg_lines))
     return cfg_file_path
@@ -128,6 +130,7 @@ def mainforward(project_dir):
     command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir} {def_file}"
 
     print(command)
+    save_message_center(project_dir,msg_center)
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     stdout, stderr = process.communicate()
     print(process.returncode)
@@ -166,6 +169,7 @@ if __name__ == "__main__":
     # Prompt the user to enter a directory path
     input_file = args.i
     project_dir = args.p
+    msg_center = check_existing_message_center(project_dir)
     def_path = save_def(input_file, project_dir)
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
 

@@ -2,29 +2,30 @@ import json
 import os
 
 
-def gen_json(json_loc, cfg_loc, def_loc, def_step, cfg_step):
-    if os.path.exists(json_loc) and os.path.getsize(json_loc) > 0:
-        with open(json_loc, 'r') as file:
-            try:
-                dgui_json = json.load(file)
-                for key in dgui_json:
-                    if key != cfg_step:
-                        dgui_json[key]['current_step'] = 0
-                    else:
-                        dgui_json[key]['current_step'] = 1
 
-            except json.JSONDecodeError:
-                # Handle the case when the file contains invalid JSON data
-                print(f"Invalid JSON data in {json_loc}.")
-                dgui_json = {}
-
+def check_existing_message_center(project_dir):
+    dgui_dir = os.path.join(project_dir, '.dgui')
+    dgui_dir_exists = os.path.exists(dgui_dir)
+    messages = []
+    if not dgui_dir_exists:
+        os.makedirs(dgui_dir)
+    msg_center_path = os.path.join(dgui_dir, 'dgui_message_center.txt')
+    msg_cntr_exists = os.path.exists(msg_center_path)
+    print(os.path.join(dgui_dir, 'dgui_message_center.txt'))
+    if not msg_cntr_exists:
+        with open(msg_center_path,'w') as file:
+            file.write('.dgui directory created\n')
+        return ['.dgui directory created']
     else:
-        dgui_json = {}
+        with open(msg_center_path, 'r') as file:
+            print(type(file))
+            for line in file:
+                messages.append(line)
+            return messages
 
-    dgui_json[def_step]['def'] = def_loc
-    if not 'cfg' in dgui_json[cfg_step]:
-        cfg_data = f"{cfg_loc}"
-        dgui_json[cfg_step]['cfg'] = cfg_data
+def save_message_center(project_dir,msg_center):
+    with open(os.path.join(project_dir, '.dgui', 'dgui_message_center.txt'), 'w') as file:
+        cleaned_strings = [s.strip() for s in msg_center if s.strip()]
+        for item in cleaned_strings:
+            file.write(f"{item}\n")  # Adding a newline character at the end of eac
 
-    with open(json_loc, 'w') as file:
-        json.dump(dgui_json, file, indent=4)

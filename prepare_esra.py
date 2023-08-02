@@ -7,6 +7,8 @@ import argparse
 
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
+from utilities.utils import *
+
 # Create the parser
 parser = argparse.ArgumentParser(description='Example argument parser')
 
@@ -157,6 +159,7 @@ if __name__ == "__main__":
     # Prompt the user to enter a directory path
     input_file = args.i
     project_dir = args.p
+    msg_center = check_existing_message_center(project_dir)
     def_path = save_def(input_file, project_dir)
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
     gen_json(json_loc, project_dir, def_path)
