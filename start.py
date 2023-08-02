@@ -76,10 +76,10 @@ def find_project_dir(input_file):
                 break  # Move the 'break' statement here
     if not path == '' :
         if not os.path.exists(path):
-            lock_file_error(f"Please provide a valid project directory path")
+            message_box(f"Please provide a valid project directory path")
             sys.exit(1)
     else:
-        lock_file_error(f"Path cannot be empty")
+        message_box(f"Path cannot be empty")
     return path
 
 
@@ -157,7 +157,7 @@ def save_existing_def_files(json_loc):
                         except Exception as e:
                             print(f"An error occured: {e}")
 
-def lock_file_error(message):
+def message_box(message):
     app = QApplication(sys.argv)
     msg_box = QMessageBox()
     msg_box.setWindowTitle("Information")
@@ -183,7 +183,7 @@ def lock_file(project_dir):
                             owner_found = True
                             break
                         else:
-                            lock_file_error(f"This directory is being used by {owner_name}\n"
+                            message_box(f"This directory is being used by {owner_name}\n"
                                             f"The current user is {os.environ.get('USER')}")
                             sys.exit(0)
 
@@ -236,21 +236,17 @@ def on_subprocess_completed(stdout, stderr, returncode):
         print(stderr.decode())
     print(f"Return Code: {returncode}")
     sys.exit(returncode)
-    # if process.returncode ==0:
-    #     sys.exit(0)
-    # else:
-    #     sys.exit(process.returncode)
-    # os.system(command)
-
 def check_permissions():
     if not os.access(project_dir, os.W_OK):
-        lock_file_error(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
-        print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
+        message_box(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
+        print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with "
+              f"read/write permissions",file=sys.stderr)
         sys.exit(1)
     elif not os.access(project_dir, os.R_OK):
-        lock_file_error(
+        message_box(
             f"{project_dir} directory is not readable, please launch dgui again and provide a directory with read/write permissions")
-        print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
+        print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with "
+              f"read/write permissions", file=sys.stderr)
 
         sys.exit(1)
 
