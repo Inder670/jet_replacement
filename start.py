@@ -83,7 +83,7 @@ def find_project_dir(input_file):
     return path
 
 
-def gen_json(json_loc,project_dir, cfg_loc, def_loc):
+def gen_json(json_loc, cfg_loc):
 
     if os.path.exists(json_loc) and os.path.getsize(json_loc) > 0:
         with open(json_loc, 'r') as file:
@@ -264,7 +264,7 @@ if __name__ == "__main__":
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
     lock_file(project_dir)
     cfg_file_path = save_cfg(project_dir)
-    gen_json(json_loc, project_dir, cfg_file_path, def_path)
+    gen_json(json_loc, cfg_file_path)
     save_existing_def_files(json_loc)
     # os.remove(input_file)
     if args.b:
