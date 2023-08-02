@@ -126,11 +126,26 @@ def mainforward(project_dir, def_path):
 
     print("Launching DGUI...")
     print(command)
+
+
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    for line in iter(process.stdout.readline, b''):
-        print(line.decode('utf-8').strip())
+    stdout, stderr = process.communicate()
     # os.system(command)
-    sys.exit(0)
+    on_subprocess_completed(stdout, stderr, process.returncode)
+
+
+def on_subprocess_completed(stdout, stderr, returncode):
+    # Process the results after the subprocess completes.
+    if returncode == 0:
+        print("Subprocess completed successfully.")
+        print("Standard Output:")
+        print(stdout.decode())
+    else:
+        print("Subprocess failed.")
+        print("Error Output:")
+        print(stderr.decode())
+    print(f"Return Code: {returncode}")
+    sys.exit(returncode)
 
 def mainback(project_dir):
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
@@ -142,8 +157,8 @@ def mainback(project_dir):
         command = f"dgui -c {data['Generate-esd_dev']['cfg']} -g  -dir ./ -j ./ --splash -p {project_dir} -d {data['Generate-esd_dev']['def']}"
         print(command)
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-        for line in iter(process.stdout.readline, b''):
-            print(line.decode('utf-8').strip())
+        stdout, stderr = process.communicate()
+        # os.system(command)
         sys.exit(0)
 
 

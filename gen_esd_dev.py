@@ -25,26 +25,6 @@ def search_files(directory):
             file_list.append(os.path.join(root, file))
     return file_list
 
-
-def generate_cfg():
-    cfg_lines = []
-    cfg_lines.append("HEADER START")
-    cfg_lines.append("VARIABLES")
-    cfg_lines.append("TITLE:: Genearte Tech Files")
-    cfg_lines.append(f"GLAUNCH:: gen_tech_files {os.path.join(os.path.dirname(sys.argv[0]), 'gen_tech_files')} 1")
-
-    # cfg_lines.append("$svdb_directory::$svdb_directory::$Input_File::$Dir")
-    cfg_lines.append("$esd_dev-and-tech_files::$cci directory file::$Input_File::$Dir")
-    # cfg_lines.append("$lvs_setup::$layout file::$Input_File::$File")
-    # cfg_lines.append("$lvs_setup::$Edtext file::$Input_File::$File")
-    # cfg_lines.append("$lvs_setup::$LVS cal file::$Input_File::$File")
-    # cfg_lines.append("$lvs_setup::$LVS cellmap file::$Input_File::$File")
-    # cfg_lines.append("$lvs_setup::$cell list file::$Input_File::$File")
-    cfg_lines.append("HEADER END")
-
-    return cfg_lines
-
-
 def save_cfg(project_dir):
     project_dir = project_dir.strip('\n')
     cfg_file_dir = os.path.join(project_dir, '.dgui', 'config_files')
@@ -54,7 +34,6 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Genearte Tech Files")
-    cfg_lines.append(f"BACK:: Generate-esd_dev  {os.path.join(os.path.dirname(sys.argv[0]), 'gen_tech_files')} 1")
     cfg_lines.append(f"GLAUNCH:: gen_tech_files {os.path.join(os.path.dirname(sys.argv[0]), 'gen_tech_files')} 1")
     cfg_lines.append("$esd_dev-and-tech_files::$cci directory file::$Input_File::$Dir")
     cfg_lines.append("HEADER END")
@@ -138,7 +117,7 @@ def check_json(json_loc):
         else:
             return None
 
-def mainforward(project_dir, def_path):
+def mainforward(project_dir):
 
     check_json_for_existing_def = check_json(json_loc)
     if check_json_for_existing_def is not None:
@@ -148,28 +127,39 @@ def mainforward(project_dir, def_path):
 
     command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir} {def_file}"
 
-    print("Launching DGUI...")
     print(command)
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    for line in iter(process.stdout.readline, b''):
-        print(line.decode('utf-8').strip())
+    stdout, stderr = process.communicate()
+    print(process.returncode)
     # os.system(command)
-    sys.exit(0)
+    on_subprocess_completed(stdout, stderr, process.returncode)
+
+
+def on_subprocess_completed(stdout, stderr, returncode):
+    # Process the results after the subprocess completes.
+    if returncode == 0:
+        print("Subprocess completed successfully.")
+        print("Standard Output:")
+        print(stdout.decode())
+    else:
+        print("Subprocess failed.")
+        print("Error Output:")
+        print(stderr.decode())
+    print(f"Return Code: {returncode}")
+    sys.exit(returncode)
 
 
 def mainback(project_dir):
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
     with open(json_loc, 'r') as file:
         data = json.load(file)
-        for key in data:
-            print(f"key: {key}, Value: {data[key]}")
 
         command = f"dgui -c {data['Prepare-CCI']['cfg']} -g  -dir ./ -j ./ --splash -p {project_dir} -d {data['Prepare-CCI']['def']}"
         print(command)
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-        for line in iter(process.stdout.readline, b''):
-            print(line.decode('utf-8').strip())
-        sys.exit(0)
+        stdout, stderr = process.communicate()
+        print(process.returncode)
+        # os.system(command)
 
 
 if __name__ == "__main__":
@@ -185,4 +175,4 @@ if __name__ == "__main__":
     if args.b:
         mainback(project_dir)
     else:
-        mainforward(project_dir, def_path)
+        mainforward(project_dir)

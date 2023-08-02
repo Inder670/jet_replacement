@@ -130,15 +130,12 @@ def mainback(project_dir):
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
     with open(json_loc, 'r') as file:
         data = json.load(file)
-        for key in data:
-            print(f"key: {key}, Value: {data[key]}")
 
         command = f"dgui -c {data['Generate-ESD-Files']['cfg']} -g  -dir ./ -j ./ --splash -p {project_dir} -d {data['Generate-ESD-Files']['def']}"
         print(command)
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-        for line in iter(process.stdout.readline, b''):
-            print(line.decode('utf-8').strip())
-        sys.exit(0)
+        stdout, stderr = process.communicate()
+        # os.system(command)
 
 
 if __name__ == "__main__":

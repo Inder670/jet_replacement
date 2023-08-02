@@ -48,7 +48,6 @@ def save_cfg(project_dir):
     cfg_file_dir = os.path.join(project_dir, '.dgui', 'config_files')
     if not os.path.exists(cfg_file_dir):
         os.makedirs(cfg_file_dir)
-    print(cfg_file_dir)
     cfg_lines = []
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
@@ -71,16 +70,16 @@ def find_project_dir(input_file):
     path = ''
     with open(input_file, 'r') as file:
         for line in file:
-            print(line)
             tokens = line.split('::')
             if tokens[1] == "$Directory":
-                path = tokens[2].strip('$')
-                print(f"Token found : {path}")
-            break
-
-    if not os.path.exists(path) or path =='':
-        lock_file_error(f"Please provide valid project directory path")
-        sys.exit(1)
+                path = tokens[2].strip('$').strip()
+                break  # Move the 'break' statement here
+    if not path == '' :
+        if not os.path.exists(path):
+            lock_file_error(f"Please provide a valid project directory path")
+            sys.exit(1)
+    else:
+        lock_file_error(f"Path cannot be empty")
     return path
 
 
@@ -152,7 +151,6 @@ def save_existing_def_files(json_loc):
                 step = data[key]
                 if 'def' in step:
                     if os.path.exists(step['def']):
-                        print(f"Following exists:{step['def']}")
                         source = step['def']
                         try:
                             shutil.copy2(source, def_back_up)
@@ -190,8 +188,8 @@ def lock_file(project_dir):
                             sys.exit(0)
 
             if not owner_found:
-                print("You are not the owner of the file.")
-                sys.exit(0)
+                print("lock file corrupted, no owner found.")
+                sys.exit(1)
 
 
 
@@ -206,7 +204,6 @@ def mainforward(def_path, project_dir, json_loc, cfg_file_path):
     if os.path.exists(json_loc):
         with open(json_loc, 'r') as file:
             data =json.load(file)
-            print(data)
             for key in data:
 
                 if data[key]['current_step'] == 1:
@@ -222,13 +219,40 @@ def mainforward(def_path, project_dir, json_loc, cfg_file_path):
         command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
 
     print("Launching DGUI...")
-    print(command)
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    for line in iter(process.stdout.readline, b''):
-        print(line.decode('utf-8').strip())
-    # os.system(command)
-    sys.exit(0)
+    stdout, stderr = process.communicate()
+    on_subprocess_completed(stdout, stderr, process.returncode)
 
+
+def on_subprocess_completed(stdout, stderr, returncode):
+    # Process the results after the subprocess completes.
+    if returncode == 0:
+        print("Subprocess completed successfully.")
+        print("Standard Output:")
+        print(stdout.decode())
+    else:
+        print("Subprocess failed.")
+        print("Error Output:")
+        print(stderr.decode())
+    print(f"Return Code: {returncode}")
+    sys.exit(returncode)
+    # if process.returncode ==0:
+    #     sys.exit(0)
+    # else:
+    #     sys.exit(process.returncode)
+    # os.system(command)
+
+def check_permissions():
+    if not os.access(project_dir, os.W_OK):
+        lock_file_error(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
+        print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
+        sys.exit(1)
+    elif not os.access(project_dir, os.R_OK):
+        lock_file_error(
+            f"{project_dir} directory is not readable, please launch dgui again and provide a directory with read/write permissions")
+        print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
+
+        sys.exit(1)
 
 def mainback():
     pass
@@ -237,9 +261,10 @@ def mainback():
 if __name__ == "__main__":
     input_file = args.i
     project_dir = find_project_dir(input_file).strip('\n')
+    check_permissions()
+
     # Copy default file to project structure
     def_path = save_def(input_file, project_dir)
-    print(project_dir)
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
     lock_file(project_dir)
     cfg_file_path = save_cfg(project_dir)
@@ -249,5 +274,4 @@ if __name__ == "__main__":
     if args.b:
         mainback()
     else:
-        print('B is not true')
         mainforward(def_path, project_dir,json_loc,cfg_file_path)
