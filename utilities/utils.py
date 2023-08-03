@@ -27,5 +27,5 @@ def save_message_center(project_dir,msg_center):
     with open(os.path.join(project_dir, '.dgui', 'dgui_message_center.txt'), 'w') as file:
         cleaned_strings = [s.strip() for s in msg_center if s.strip()]
         for item in cleaned_strings:
-            file.write(f"{item}\n")  # Adding a newline character at the end of eac
+            file.write(f"-> {item}\n")  # Adding a newline character at the end of eac
 
