@@ -169,6 +169,16 @@ def message_box(message):
     msg_box.setText(message)
     msg_box.exec_()
 
+def question_box(message):
+    app = QApplication(sys.argv)
+    msg_box = QMessageBox()
+    msg_box.setWindowTitle("Information")
+    msg_box.setIcon(QMessageBox.Question)
+    msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    msg_box.setText(message)
+    res = msg_box.exec_()
+    return res == QMessageBox.Yes
+
 
 def lock_file(project_dir):
     lock_file_path = os.path.join(project_dir, '.dgui', 'dgui.lock')
@@ -184,11 +194,24 @@ def lock_file(project_dir):
                         owner_name = line.split(':')[1].strip()
                         if os.environ.get('USER') == owner_name:
                             owner_found = True
+                            result = question_box("This directory contains an existing project. Click yes to continue working on the existing project")
+                            if result:
+                                pass
+                            else:
+                                sys.exit(0)
                             break
+                        elif os.environ.get('USER') != owner_name:
+                            owner_found = True
+                            result = question_box(f"This directory is being used by {owner_name}\n"
+                                            f"Would you like to transfer ownership of this project to the user : {os.environ.get('USER') }")
+                            if result:
+                                os.remove(lock_file_path)
+                                with open(lock_file_path, 'w') as file:
+                                    file.write(f"owner:{os.environ.get('USER')}")
+                            else:
+                                sys.exit(0)
                         else:
-                            message_box(f"This directory is being used by {owner_name}\n"
-                                            f"The current user is {os.environ.get('USER')}")
-                            sys.exit(0)
+                            pass
 
             if not owner_found:
                 print("lock file corrupted, no owner found.")

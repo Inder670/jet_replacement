@@ -131,8 +131,8 @@ def mainforward(project_dir, def_path):
     message_center_file = os.path.join(project_dir, '.dgui', 'dgui_message_center.txt')
     if os.path.exists(lock_file_path):
         os.remove(lock_file_path)
-    if os.path.exists(message_center_file):
-        os.remove(message_center_file)
+    # if os.path.exists(message_center_file):
+    #     os.remove(message_center_file)
     message_box("You are now ready to run the ESRA Simulation")
     # cfg_file_path = save_cfg(project_dir)
     # command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
