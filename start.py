@@ -20,30 +20,6 @@ parser.add_argument('-b', help='Launch previous gui flag', action='store_true')
 args = parser.parse_args()
 
 
-def search_files(directory):
-    file_list = []
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            file_list.append(os.path.join(root, file))
-    return file_list
-
-
-def save_def(input, path):
-    path = path.strip('\n')
-    def_files_path = os.path.join(path, '.dgui', "def_files")
-
-    if not os.path.exists(def_files_path):
-        os.makedirs(def_files_path)
-
-    new_loc = os.path.join(def_files_path, 'project_dir.txt')
-    try:
-        shutil.copy2(input, new_loc)
-    except Exception as e:
-        print(f"An error occured: {e}")
-
-    return new_loc
-
-
 def save_cfg(project_dir):
 
 
@@ -58,14 +34,14 @@ def save_cfg(project_dir):
     cfg_lines.append(
         f"GLAUNCH:: Skip-LVS-Preparation {os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'prepare_lvs')} 1")
     cfg_lines.append(
-        f"GLAUNCH:: Analyze-LVS {os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'analyze_lvs')} 1")
+        f"GLAUNCH:: Next(Analyze-LVS) {os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'analyze_lvs')} 1")
     cfg_lines.append("$lvs_setup*::$Calibre.run file::$Input_File::$File")
     cfg_lines.append("$lvs_setup*::$sourceme file::$Input_File::$File")
     cfg_lines.append("HEADER END")
 
     cfg_file_path = os.path.join(cfg_file_dir, 'analyze_lvs.cfg')
     if not os.path.exists(cfg_file_path):
-        msg_center.append(f"cfg saved: analyze_lvs.cfg")
+        add_to_message_center(project_dir,f"->cfg saved: analyze_lvs.cfg")
         with open(cfg_file_path, "w") as cfg_file:
             cfg_file.write("\n".join(cfg_lines))
 
@@ -221,12 +197,8 @@ def lock_file(project_dir):
 
 
 
-def mainforward(def_path, project_dir, json_loc, cfg_file_path):
+def main(project_dir, json_loc, cfg_file_path):
     check_json_for_existing_def = check_json(json_loc)
-    # if check_json_for_existing_def is not None:
-    #     def_file = f"-d {check_json_for_existing_def}"
-    # else:
-    #     def_file = ''
 
     if os.path.exists(json_loc):
         with open(json_loc, 'r') as file:
@@ -244,26 +216,11 @@ def mainforward(def_path, project_dir, json_loc, cfg_file_path):
     else:
 
         command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir}"
-    save_message_center(project_dir,msg_center)
     print("Launching DGUI...")
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    stdout, stderr = process.communicate()
-    on_subprocess_completed(stdout, stderr, process.returncode)
+    execute_subprocess(command)
 
 
-def on_subprocess_completed(stdout, stderr, returncode):
-    # Process the results after the subprocess completes.
-    if returncode == 0:
-        print("Subprocess completed successfully.")
-        print("Standard Output:")
-        print(stdout.decode())
-    else:
-        print("Subprocess failed.")
-        print("Error Output:")
-        print(stderr.decode())
-    print(f"Return Code: {returncode}")
-    sys.exit(returncode)
-def check_permissions():
+def check_permissions(project_dir):
     if not os.access(project_dir, os.W_OK):
         message_box(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
         print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with "
@@ -277,28 +234,16 @@ def check_permissions():
 
         sys.exit(1)
 
-
-
-
-def mainback():
-    pass
-
-
-
 if __name__ == "__main__":
     input_file = args.i
     project_dir = find_project_dir(input_file).strip('\n')
-    msg_center = check_existing_message_center(project_dir)
-    check_permissions()
-    # Copy default file to project structure
-    def_path = save_def(input_file, project_dir)
+    check_permissions(project_dir)
+    def_path = save_def(input_file, project_dir, "project_dir.txt")
     json_loc = os.path.join(project_dir, '.dgui', 'dgui_data.json')
     lock_file(project_dir)
     cfg_file_path = save_cfg(project_dir)
     gen_json(json_loc, cfg_file_path)
     save_existing_def_files(json_loc)
     # os.remove(input_file)
-    if args.b:
-        mainback()
-    else:
-        mainforward(def_path, project_dir,json_loc,cfg_file_path)
+
+    main(project_dir,json_loc,cfg_file_path)
