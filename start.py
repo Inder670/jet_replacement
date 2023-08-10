@@ -1,9 +1,4 @@
-import json
-import os
-import subprocess
-import sys
 import argparse
-import shutil
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
 from utilities.utils import *
