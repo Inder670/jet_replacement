@@ -26,7 +26,7 @@ def save_cfg(project_dir):
     cfg_lines.append("$Esd* Files::$APD File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$Ploc File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$sp File::$Input_File::$File")
-    cfg_lines.append("$Esd* Files::$generation method::$String::$gds+apd gds_only  Resistive-Package-Model Package-Layout other")
+    cfg_lines.append("$Esd* Files::$generation method::$ESD-Files::$gds+apd gds_only  Resistive-Package-Model Package-Layout other")
     cfg_lines.append("HEADER END")
     cfg_file_path = os.path.join(cfg_file_dir, 'gen_esd_files.cfg')
 

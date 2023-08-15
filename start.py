@@ -216,19 +216,22 @@ def main(project_dir, json_loc, cfg_file_path):
 
 
 def check_permissions(project_dir):
-    if not os.access(project_dir, os.W_OK):
-        message_box(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
-        print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with "
-              f"read/write permissions",file=sys.stderr)
-        sys.exit(1)
-    elif not os.access(project_dir, os.R_OK):
-        message_box(
-            f"{project_dir} directory is not readable, please launch dgui again and provide a directory with read/write permissions")
-        print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with "
-              f"read/write permissions", file=sys.stderr)
+    if os.path.exists(project_dir):
+        if not os.access(project_dir, os.W_OK):
+            message_box(
+                f"{project_dir} directory is not writable, please launch dgui again and provide a directory with read/write permissions")
+            print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with "
+                  f"read/write permissions", file=sys.stderr)
+            sys.exit(1)
+        elif not os.access(project_dir, os.R_OK):
+            message_box(
+                f"{project_dir} directory is not readable, please launch dgui again and provide a directory with read/write permissions")
+            print(f"{project_dir} directory is not writable, please launch dgui again and provide a directory with "
+                  f"read/write permissions", file=sys.stderr)
 
-        sys.exit(1)
-
+            sys.exit(1)
+    else:
+        message_box("Project directory doesn't exist. Please launch dgui again and provide a project directory")
 if __name__ == "__main__":
     input_file = args.i
     project_dir = find_project_dir(input_file).strip('\n')
