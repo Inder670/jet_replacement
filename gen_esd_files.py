@@ -22,7 +22,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Prepare esra")
-    cfg_lines.append(f"GLAUNCH:: Finish(prepare_esra) {os.path.join(os.path.dirname(sys.argv[0]), 'prepare_esra')} 1")
+    cfg_lines.append(f"GLAUNCH:: Finish(prepare_esra) prepare_esra 1")
     cfg_lines.append("$technology_files*::$itf file::$Input_File::$File")
     cfg_lines.append("$technology_files*::$map file::$Input_File::$File")
     cfg_lines.append("$MOS Max Stress Limits*::$Values::$Table::$mv.dv.dv,ww.wa.we.re->3x4")

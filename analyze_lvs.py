@@ -24,7 +24,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Prepare LVS")
-    cfg_lines.append(f"GLAUNCH:: Next(Prepare-LVS) {os.path.join(os.path.dirname(sys.argv[0]), 'prepare_lvs')} 1")
+    cfg_lines.append(f"GLAUNCH:: Next(Prepare-LVS) prepare_lvs 1")
     cfg_lines.append("$lvs_setup*::$circuit file::$Input_File::$File::$TXT: HEHEHEHE")
     cfg_lines.append("$lvs_setup*::$layout file::$Input_File::$File::$TXT: HEHEHEHE")
     cfg_lines.append("$lvs_setup*::$Edtext file::$Input_File::$File")

@@ -22,7 +22,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Generate esd files")
-    cfg_lines.append(f"GLAUNCH:: Next(generate_esd_files) {os.path.join(os.path.dirname(sys.argv[0]),'gen_esd_files')} 1")
+    cfg_lines.append(f"GLAUNCH:: Next(generate_esd_files) gen_esd_files 1")
     cfg_lines.append("$Esd* Files::$APD File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$Ploc File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$sp File::$Input_File::$File")

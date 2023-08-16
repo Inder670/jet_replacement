@@ -23,7 +23,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: esd_dev")
-    cfg_lines.append(f"GLAUNCH:: Next(generate_esd_dev) {os.path.join(os.path.dirname(sys.argv[0]), 'gen_esd_dev')} 1")
+    cfg_lines.append(f"GLAUNCH:: Next(generate_esd_dev) gen_esd_dev 1")
     cfg_lines.append("$esd_dev-and-tech_files*::$clamp rule file::$Input_File::$File")
     cfg_lines.append("HEADER END")
     cfg_file_path = os.path.join(cfg_file_dir, 'gen_esd_dev.cfg')
