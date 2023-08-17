@@ -1,6 +1,7 @@
 import argparse
 
 from utilities.utils import *
+from utilities.variables import *
 
 # Create the parser
 parser = argparse.ArgumentParser(description='Example argument parser')
@@ -13,6 +14,8 @@ parser.add_argument('-p', type=str, help='project directory')
 # Parse the command-line arguments
 args = parser.parse_args()
 
+message_center_logger = setup_logger(os.path.join(args.p, message_center), message_center)
+saved_files_logger = setup_logger(os.path.join(args.p, saved_files),saved_files)
 def save_cfg(project_dir):
     project_dir = project_dir.strip('\n')
     cfg_file_dir = os.path.join(project_dir, '.dgui', 'config_files')
@@ -40,7 +43,7 @@ def save_cfg(project_dir):
     cfg_file_path = os.path.join(cfg_file_dir, 'prepare_esra.cfg')
 
     if not os.path.exists(cfg_file_path):
-        add_to_message_center(project_dir,f"-> cfg saved: prepare_esra.cfg")
+        message_center_logger.info(f"-> cfg saved: prepare_esra.cfg")
         with open(cfg_file_path, "w") as cfg_file:
             cfg_file.write("\n".join(cfg_lines))
     return cfg_file_path

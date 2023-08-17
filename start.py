@@ -1,4 +1,5 @@
 import argparse
+from utilities.variables import message_center, saved_files
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
 from utilities.utils import *
@@ -8,40 +9,11 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 # Add arguments
 parser.add_argument('-i', type=str, help='input file(def file)')
 parser.add_argument('-o', type=str, help='output directory')
-parser.add_argument('-p', type=str, help='project directory')
 parser.add_argument('-b', help='Launch previous gui flag', action='store_true')
+parser.add_argument('-p', help='Project_dir')
 
 # Parse the command-line arguments
 args = parser.parse_args()
-
-
-def save_cfg(project_dir):
-
-
-    project_dir = project_dir.strip('\n')
-    cfg_file_dir = os.path.join(project_dir, '.dgui', 'config_files')
-    if not os.path.exists(cfg_file_dir):
-        os.makedirs(cfg_file_dir)
-    cfg_lines = []
-    cfg_lines.append("HEADER START")
-    cfg_lines.append("VARIABLES")
-    cfg_lines.append("TITLE:: Analyze LVS")
-    cfg_lines.append(
-        f"GLAUNCH:: Skip-LVS-Preparation prepare_lvs' 1")
-    cfg_lines.append(
-        f"GLAUNCH:: Next(Analyze-LVS) analyze_lvs 1")
-    cfg_lines.append("$lvs_setup*::$Calibre.run file::$Input_File::$File")
-    cfg_lines.append("$lvs_setup*::$sourceme file::$Input_File::$File")
-    cfg_lines.append("HEADER END")
-
-    cfg_file_path = os.path.join(cfg_file_dir, 'analyze_lvs.cfg')
-    if not os.path.exists(cfg_file_path):
-        add_to_message_center(project_dir,f"->cfg saved: analyze_lvs.cfg")
-        with open(cfg_file_path, "w") as cfg_file:
-            cfg_file.write("\n".join(cfg_lines))
-
-    return cfg_file_path
-
 
 def find_project_dir(input_file):
     path = ''
@@ -56,8 +28,36 @@ def find_project_dir(input_file):
             message_box(f"Please provide a valid project directory path")
             sys.exit(1)
     else:
-        message_box(f"Path cannot be empty")
+        message_box(f"Project Directory cannot be empty")
+        sys.exit(1)
     return path
+
+def save_cfg(project_dir):
+
+
+    project_dir = project_dir.strip('\n')
+    cfg_file_dir = os.path.join(project_dir, '.dgui', 'config_files')
+    if not os.path.exists(cfg_file_dir):
+        os.makedirs(cfg_file_dir)
+    cfg_lines = []
+    cfg_lines.append("HEADER START")
+    cfg_lines.append("VARIABLES")
+    cfg_lines.append("TITLE:: Analyze LVS")
+    cfg_lines.append(
+        f"GLAUNCH:: Skip-LVS-Preparation prepare_lvs 1")
+    cfg_lines.append(
+        f"GLAUNCH:: Next(Analyze-LVS) analyze_lvs 1")
+    cfg_lines.append("$lvs_setup*::$Calibre.run file::$Input_File::$File")
+    cfg_lines.append("$lvs_setup*::$sourceme file::$Input_File::$File")
+    cfg_lines.append("HEADER END")
+
+    cfg_file_path = os.path.join(cfg_file_dir, 'analyze_lvs.cfg')
+    if not os.path.exists(cfg_file_path):
+        message_center_logger.info("->cfg saved: analyze_lvs.cfg")
+        with open(cfg_file_path, "w") as cfg_file:
+            cfg_file.write("\n".join(cfg_lines))
+
+    return cfg_file_path
 
 
 def gen_json(json_loc, cfg_loc):
@@ -233,6 +233,8 @@ def check_permissions(project_dir):
     else:
         message_box("Project directory doesn't exist. Please launch dgui again and provide a project directory")
 if __name__ == "__main__":
+    message_center_logger = setup_logger(os.path.join(find_project_dir(args.i), message_center), message_center)
+    saved_files_logger = setup_logger(os.path.join(find_project_dir(args.i), saved_files), saved_files)
     input_file = args.i
     project_dir = find_project_dir(input_file).strip('\n')
     check_permissions(project_dir)

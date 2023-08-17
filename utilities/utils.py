@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -47,6 +48,31 @@ def on_subprocess_completed(stdout, stderr, returncode):
     print(f"Return Code: {returncode}")
     sys.exit(returncode)
 
+
+def setup_logger(log_file,name):
+    # Create the directory if it doesn't exist
+    log_dir = os.path.dirname(log_file)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    # Create a logger
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+
+    # Check if the log file exists
+    file_exists = os.path.exists(log_file)
+
+    # Create a file handler
+    file_handler = logging.FileHandler(log_file, mode='a' if file_exists else 'w')
+
+    # Create a formatter and attach it to the handler
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+
+    # Add the handler to the logger
+    logger.addHandler(file_handler)
+
+    return logger
 def add_to_message_center(project_dir, text_to_append):
     try:
         # Open the file in append mode
@@ -114,6 +140,7 @@ def check_json(json_loc,step):
                 return path_to_def
         else:
             return None
+
 
 def execute_subprocess(command):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)

@@ -1,7 +1,6 @@
 import argparse
-
+from utilities.variables import *
 from PyQt5.QtWidgets import QApplication, QMessageBox
-
 from utilities.utils import *
 
 # Create the parser
@@ -14,6 +13,9 @@ parser.add_argument('-p', type=str, help='project directory')
 
 # Parse the command-line arguments
 args = parser.parse_args()
+
+message_center_logger = setup_logger(os.path.join(args.p, message_center), message_center)
+saved_files_logger = setup_logger(os.path.join(args.p, saved_files),saved_files)
 
 def save_cfg(project_dir):
     project_dir = project_dir.strip('\n')
