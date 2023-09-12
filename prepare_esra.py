@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import argparse
 from utilities.variables import *
 from PyQt5.QtWidgets import QApplication, QMessageBox
@@ -8,7 +10,6 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 
 # Add arguments
 parser.add_argument('-i', type=str, help='input file(def file)')
-parser.add_argument('-o', type=str, help='output directory')
 parser.add_argument('-p', type=str, help='project directory')
 
 # Parse the command-line arguments

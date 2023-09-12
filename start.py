@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import argparse
 from utilities.variables import message_center, saved_files
 from PyQt5.QtWidgets import QApplication, QMessageBox
@@ -9,7 +11,6 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 # Add arguments
 parser.add_argument('-i', type=str, help='input file(def file)')
 parser.add_argument('-o', type=str, help='output directory')
-parser.add_argument('-b', help='Launch previous gui flag', action='store_true')
 parser.add_argument('-p', help='Project_dir')
 
 # Parse the command-line arguments
@@ -20,7 +21,7 @@ def find_project_dir(input_file):
     with open(input_file, 'r') as file:
         for line in file:
             tokens = line.split('::')
-            if tokens[1] == "$Directory":
+            if tokens[1] == "$Project-Directory":
                 path = tokens[2].strip('$').strip()
                 break  # Move the 'break' statement here
     if not path == '' :
@@ -47,8 +48,8 @@ def save_cfg(project_dir):
         f"GLAUNCH:: Skip-LVS-Preparation prepare_lvs 1")
     cfg_lines.append(
         f"GLAUNCH:: Next(Analyze-LVS) analyze_lvs 1")
-    cfg_lines.append("$lvs_setup*::$Calibre.run file::$Input_File::$File")
-    cfg_lines.append("$lvs_setup*::$sourceme file::$Input_File::$File")
+    cfg_lines.append("$LVS-Setup::$Calibre.run file::$Input_File::$File")
+    cfg_lines.append("$LVS-Setup::$sourceme file::$Input_File::$File")
     cfg_lines.append("HEADER END")
 
     cfg_file_path = os.path.join(cfg_file_dir, 'analyze_lvs.cfg')
@@ -118,21 +119,21 @@ def check_json(json_loc):
 
 def save_existing_def_files(json_loc):
     if os.path.exists(json_loc):
-        with open(json_loc, 'r') as file:
-            data = json.load(file)
-            def_back_up = os.path.join(os.path.dirname(json_loc), 'def_back_up')
-            if not os.path.exists(def_back_up):
-                os.makedirs(def_back_up)
+        # with open(json_loc, 'r') as file:
+        #     data = json.load(file)
+        def_back_up = os.path.join(os.path.dirname(json_loc), 'def_back_up')
+        if not os.path.exists(def_back_up):
+            os.makedirs(def_back_up)
 
-            for key in data:
-                step = data[key]
-                if 'def' in step:
-                    if os.path.exists(step['def']):
-                        source = step['def']
-                        try:
-                            shutil.copy2(source, def_back_up)
-                        except Exception as e:
-                            print(f"An error occured: {e}")
+            # for key in data:
+            #     step = data[key]
+            #     if 'def' in step:
+            #         if os.path.exists(step['def']):
+            #             source = step['def']
+            #             try:
+            #                 shutil.copy2(source, def_back_up)
+            #             except Exception as e:
+            #                 print(f"An error occured: {e}")
 
 def message_box(message):
     app = QApplication(sys.argv)
@@ -202,10 +203,11 @@ def main(project_dir, json_loc, cfg_file_path):
 
                 if data[key]['current_step'] == 1:
                     cfg_file_path = data[key]['cfg']
+                    def_file = ''
                     if 'def' in data[key]:
-                        def_file = f"-d {data[key]['def']}"
-                    else:
-                        def_file = ''
+                        if os.path.exists(data[key]['def']):
+                            def_file = f"-d {data[key]['def']}"
+
 
                     command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir} {def_file}"
     else:

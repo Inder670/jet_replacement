@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import argparse
 
 from utilities.utils import *
@@ -8,7 +10,6 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 
 # Add arguments
 parser.add_argument('-i', type=str, help='input file(def file)')
-parser.add_argument('-o', type=str, help='output directory')
 parser.add_argument('-p', type=str, help='project directory')
 
 # Parse the command-line arguments
@@ -25,8 +26,8 @@ def save_cfg(project_dir):
     cfg_lines = []
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
-    cfg_lines.append("TITLE:: Generate esd files")
-    cfg_lines.append(f"GLAUNCH:: Next(generate_esd_files) gen_esd_files 1")
+    cfg_lines.append("TITLE:: Generate ESD Files")
+    cfg_lines.append(f"GLAUNCH:: Next(Generate-ESD-Files) gen_esd_files 1")
     cfg_lines.append("$Esd* Files::$APD File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$Ploc File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$sp File::$Input_File::$File")

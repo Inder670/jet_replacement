@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import argparse
 from utilities.variables import *
 
@@ -7,7 +9,6 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 
 # Add arguments
 parser.add_argument('-i', type=str, help='input file(def file)')
-parser.add_argument('-o', type=str, help='output directory')
 parser.add_argument('-p', type=str, help='project directory')
 # Parse the command-line arguments
 args = parser.parse_args()
@@ -22,9 +23,9 @@ def save_cfg(project_dir):
     cfg_lines = []
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
-    cfg_lines.append("TITLE:: Genearte Tech Files")
-    cfg_lines.append(f"GLAUNCH:: Next(gen_tech_files) gen_tech_files 1")
-    cfg_lines.append("$esd_dev-and-tech_files*::$cci directory file::$Input_File::$Dir")
+    cfg_lines.append("TITLE:: Generate Tech Files")
+    cfg_lines.append(f"GLAUNCH:: Next(Generate-Tech-Files) gen_tech_files 1")
+    cfg_lines.append("$Generate-Tech-Files::$CCI Directory::$Input_File::$Dir")
     cfg_lines.append("HEADER END")
     cfg_file_path = os.path.join(cfg_file_dir, 'gen_tech_files.cfg')
 

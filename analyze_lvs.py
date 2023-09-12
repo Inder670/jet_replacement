@@ -1,3 +1,4 @@
+#!/bin/python3
 
 import argparse
 from utilities.utils import *
@@ -8,7 +9,6 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 
 # Add arguments
 parser.add_argument('-i', type=str, help='input file(def file)')
-parser.add_argument('-o', type=str, help='output directory')
 parser.add_argument('-p', type=str, help='project directory')
 
 # Parse the command-line arguments
@@ -27,12 +27,12 @@ def save_cfg(project_dir):
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Prepare LVS")
     cfg_lines.append(f"GLAUNCH:: Next(Prepare-LVS) prepare_lvs 1")
-    cfg_lines.append("$lvs_setup*::$circuit file::$Input_File::$File::$TXT: HEHEHEHE")
-    cfg_lines.append("$lvs_setup*::$layout file::$Input_File::$File::$TXT: HEHEHEHE")
-    cfg_lines.append("$lvs_setup*::$Edtext file::$Input_File::$File")
-    cfg_lines.append("$lvs_setup*::$LVS cal file::$Input_File::$File")
-    cfg_lines.append("$lvs_setup*::$LVS cellmap file::$Input_File::$File")
-    cfg_lines.append("$lvs_setup*::$cell list file::$Input_File::$File")
+    cfg_lines.append("$LVS-Setup::$Circuit File::$Input_File::$File")
+    cfg_lines.append("$LVS-Setup::$Layout File::$Input_File::$File")
+    cfg_lines.append("$LVS-Setup::$Edtext File::$Input_File::$File")
+    cfg_lines.append("$LVS-Setup::$LVS Cal File::$Input_File::$File")
+    cfg_lines.append("$LVS-Setup::$LVS Cellmap File::$Input_File::$File")
+    cfg_lines.append("$LVS-Setup::$Cell List File::$Input_File::$File")
     cfg_lines.append("HEADER END")
 
     cfg_file_path = os.path.join(cfg_file_dir, 'prepare_lvs.cfg')
@@ -46,7 +46,10 @@ def save_cfg(project_dir):
     return cfg_file_path
 
 def main(project_dir, cfg_file_path,json_loc):
-    def_file = get_def_file(json_loc, "Prepare-LVS")
+    def_path = get_def_file(json_loc, "Prepare-LVS")
+    def_file = ''
+    if os.path.exists(def_path):
+        def_file = def_path
     command = f"dgui -c {cfg_file_path} -g  -dir ./ -j ./ --splash -p {project_dir} {def_file}"
     print("Launching DGUI...")
     execute_subprocess(command)

@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import argparse
 
 from utilities.utils import *
@@ -8,7 +10,6 @@ parser = argparse.ArgumentParser(description='Example argument parser')
 
 # Add arguments
 parser.add_argument('-i', type=str, help='input file(def file)')
-parser.add_argument('-o', type=str, help='output directory')
 parser.add_argument('-p', type=str, help='project directory')
 
 # Parse the command-line arguments
@@ -24,18 +25,18 @@ def save_cfg(project_dir):
     cfg_lines = []
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
-    cfg_lines.append("TITLE:: Prepare esra")
-    cfg_lines.append(f"GLAUNCH:: Finish(prepare_esra) prepare_esra 1")
-    cfg_lines.append("$technology_files*::$itf file::$Input_File::$File")
-    cfg_lines.append("$technology_files*::$map file::$Input_File::$File")
-    cfg_lines.append("$MOS Max Stress Limits*::$Values::$Table::$mv.dv.dv,ww.wa.we.re->3x4")
-    cfg_lines.append("$CDM Stress Current*::$Direct Entry::$String::$ANY")
-    cfg_lines.append("$CDM Stress Current*::$Technology::$String::$ANY")
-    cfg_lines.append("$Chip Bond::$Chip Bond*::$String::$Flip-Chip Wire-Bond")
-    cfg_lines.append("$Esd Grid*::$NX::$String::$ANY")
-    cfg_lines.append("$Esd Grid*::$NY::$String::$ANY")
-    cfg_lines.append("$Die Size*::$X::$String::$ANY")
-    cfg_lines.append("$Die Size*::$Y::$String::$ANY")
+    cfg_lines.append("TITLE:: Prepare ESRA")
+    cfg_lines.append(f"GLAUNCH:: Finish(Prepare-ESRA) prepare_esra 1")
+    cfg_lines.append("$technology_files::$itf file::$Input_File::$File")
+    cfg_lines.append("$technology_files::$map file::$Input_File::$File")
+    cfg_lines.append("$MOS Max Stress Limits::$Values::$Table::$VGS.VDS_P.VDS_N,LV.MV.HV.UHV->3x4")
+    cfg_lines.append("$CDM Stress Current::$Direct Entry::$String::$ANY")
+    cfg_lines.append("$CDM Stress Current::$Technology::$String::$ANY")
+    cfg_lines.append("$Chip Bond::$Chip Bond::$String::$Flip-Chip Wire-Bond")
+    cfg_lines.append("$Esd Grid::$NX::$String::$ANY")
+    cfg_lines.append("$Esd Grid::$NY::$String::$ANY")
+    cfg_lines.append("$Die Size::$X::$String::$ANY")
+    cfg_lines.append("$Die Size::$Y::$String::$ANY")
     cfg_lines.append("$em_store/preem_store*::$preem_store::$String::$True False")
     cfg_lines.append("$em_store/preem_store*::$em_store::$String::$True False")
     cfg_lines.append("HEADER END")

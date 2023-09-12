@@ -44,8 +44,7 @@ def on_subprocess_completed(stdout, stderr, returncode):
     else:
         print("Subprocess failed.")
         print("Error Output:")
-        print(stderr.decode())
-    print(f"Return Code: {returncode}")
+        print(stderr)
     sys.exit(returncode)
 
 
@@ -116,7 +115,7 @@ def save_def(input, path, name):
 
     new_loc = os.path.join(def_files_path, name)
     try:
-        shutil.copy2(input, new_loc)
+        shutil.move(input, new_loc)
     except Exception as e:
         print(f"An error occured: {e}")
 
