@@ -1,4 +1,5 @@
-#!/bin/python3
+#!/global/sys_signoff/users/inder/pycharmprojects/jet_replacement/venv/bin/python
+
 
 import argparse
 
@@ -26,7 +27,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Prepare ESRA")
-    cfg_lines.append(f"GLAUNCH:: Finish(Prepare-ESRA) prepare_esra 1")
+    cfg_lines.append(f"GLAUNCH:: Finish(Prepare-ESRA) prepare_esra.py 0")
     cfg_lines.append("$technology_files::$itf file::$Input_File::$File")
     cfg_lines.append("$technology_files::$map file::$Input_File::$File")
     cfg_lines.append("$MOS Max Stress Limits::$Values::$Table::$VGS.VDS_P.VDS_N,LV.MV.HV.UHV->3x4")

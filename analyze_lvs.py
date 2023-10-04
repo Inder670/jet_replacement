@@ -1,4 +1,5 @@
-#!/bin/python3
+#!/global/sys_signoff/users/inder/pycharmprojects/jet_replacement/venv/bin/python
+
 
 import argparse
 from utilities.utils import *
@@ -26,7 +27,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Prepare LVS")
-    cfg_lines.append(f"GLAUNCH:: Next(Prepare-LVS) prepare_lvs 1")
+    cfg_lines.append(f"GLAUNCH:: Next(Prepare-LVS) prepare_lvs.py 0")
     cfg_lines.append("$LVS-Setup::$Circuit File::$Input_File::$File")
     cfg_lines.append("$LVS-Setup::$Layout File::$Input_File::$File")
     cfg_lines.append("$LVS-Setup::$Edtext File::$Input_File::$File")

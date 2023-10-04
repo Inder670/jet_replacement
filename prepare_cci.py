@@ -1,4 +1,5 @@
-#!/bin/python3
+#!/global/sys_signoff/users/inder/pycharmprojects/jet_replacement/venv/bin/python
+
 
 import argparse
 from utilities.utils import *
@@ -25,7 +26,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Generate ESD_Dev")
-    cfg_lines.append(f"GLAUNCH:: Next(Generate-ESD-Dev) gen_esd_dev 1")
+    cfg_lines.append(f"GLAUNCH:: Next(Generate-ESD-Dev) gen_esd_dev.py 0")
     cfg_lines.append("$Esd_Dev-File::$clamp rule file::$Input_File::$File")
     cfg_lines.append("HEADER END")
     cfg_file_path = os.path.join(cfg_file_dir, 'gen_esd_dev.cfg')

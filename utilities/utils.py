@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 import sys
+from time import sleep
 
 
 def gen_json(json_loc, cfg_loc, def_loc, current_step, next_step):
@@ -47,8 +48,7 @@ def on_subprocess_completed(stdout, stderr, returncode):
         print(stderr)
     sys.exit(returncode)
 
-
-def setup_logger(log_file,name):
+def setup_logger(log_file, name):
     # Create the directory if it doesn't exist
     log_dir = os.path.dirname(log_file)
     if not os.path.exists(log_dir):
@@ -64,14 +64,20 @@ def setup_logger(log_file,name):
     # Create a file handler
     file_handler = logging.FileHandler(log_file, mode='a' if file_exists else 'w')
 
-    # Create a formatter and attach it to the handler
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
+    # Create a console handler
+    console_handler = logging.StreamHandler()
 
-    # Add the handler to the logger
+    # Create a formatter and attach it to the handlers
+    formatter = logging.Formatter('%(message)s')
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
+
+    # Add the handlers to the logger
     logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
 
     return logger
+
 def add_to_message_center(project_dir, text_to_append):
     try:
         # Open the file in append mode
@@ -92,6 +98,7 @@ def check_existing_message_center(project_dir):
     messages = []
     if not dgui_dir_exists:
         os.makedirs(dgui_dir)
+
     msg_center_path = os.path.join(dgui_dir, 'dgui_message_center.txt')
     msg_cntr_exists = os.path.exists(msg_center_path)
     print(os.path.join(dgui_dir, 'dgui_message_center.txt'))
@@ -115,7 +122,7 @@ def save_def(input, path, name):
 
     new_loc = os.path.join(def_files_path, name)
     try:
-        shutil.move(input, new_loc)
+        shutil.copy2(input, new_loc)
     except Exception as e:
         print(f"An error occured: {e}")
 
@@ -142,10 +149,28 @@ def check_json(json_loc,step):
 
 
 def execute_subprocess(command):
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    stdout, stderr = process.communicate()
-    # os.system(command)
-    on_subprocess_completed(stdout, stderr, process.returncode)
+    # sleep(5)
+
+    process = subprocess.Popen(command, shell=True)
+    print("Script Finished")
+
+    sys.exit(0)
+    # while True:
+    #     output_line = process.stdout.readline()
+    #     if not output_line:
+    #         break  # No more stdout output
+    #     print(output_line.decode('utf-8'), end='')
+    #
+    # # Capture stderr using communicate()
+    #
+    #
+    # _, stderr_output = process.communicate()
+    #
+    # if stderr_output:
+    #     print(stderr_output.decode('utf-8'))
+
+    # stdout, stderr = process.communicate()
+    # on_subprocess_completed(stdout, stderr, process.returncode)
 
 def get_def_file(json_loc, step):
     check_if_exists = check_json(json_loc, step)

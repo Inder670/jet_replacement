@@ -1,4 +1,5 @@
-#!/bin/python3
+#!/global/sys_signoff/users/inder/pycharmprojects/jet_replacement/venv/bin/python
+
 
 import argparse
 
@@ -27,7 +28,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Generate ESD Files")
-    cfg_lines.append(f"GLAUNCH:: Next(Generate-ESD-Files) gen_esd_files 1")
+    cfg_lines.append(f"GLAUNCH:: Next(Generate-ESD-Files) gen_esd_files.py 0")
     cfg_lines.append("$Esd* Files::$APD File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$Ploc File::$Input_File::$File")
     cfg_lines.append("$Esd* Files::$sp File::$Input_File::$File")

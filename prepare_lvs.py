@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/global/sys_signoff/users/inder/pycharmprojects/jet_replacement/venv/bin/python
 
 import argparse
 from utilities.variables import *
@@ -25,7 +25,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Prepare cci")
-    cfg_lines.append(f"GLAUNCH:: Next(Prepare-CCI) prepare_cci 1")
+    cfg_lines.append(f"GLAUNCH:: Next(Prepare-CCI) prepare_cci.py 0")
     cfg_lines.append("$SVDB Directory::$SVDB Directory::$Input_File::$Dir")
     cfg_lines.append("HEADER END")
 

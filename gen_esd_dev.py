@@ -1,4 +1,5 @@
-#!/bin/python3
+#!/global/sys_signoff/users/inder/pycharmprojects/jet_replacement/venv/bin/python
+
 
 import argparse
 from utilities.variables import *
@@ -24,7 +25,7 @@ def save_cfg(project_dir):
     cfg_lines.append("HEADER START")
     cfg_lines.append("VARIABLES")
     cfg_lines.append("TITLE:: Generate Tech Files")
-    cfg_lines.append(f"GLAUNCH:: Next(Generate-Tech-Files) gen_tech_files 1")
+    cfg_lines.append(f"GLAUNCH:: Next(Generate-Tech-Files) gen_tech_files.py 0")
     cfg_lines.append("$Generate-Tech-Files::$CCI Directory::$Input_File::$Dir")
     cfg_lines.append("HEADER END")
     cfg_file_path = os.path.join(cfg_file_dir, 'gen_tech_files.cfg')

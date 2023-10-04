@@ -1,4 +1,5 @@
-#!/bin/python3
+#!/global/sys_signoff/users/inder/pycharmprojects/jet_replacement/venv/bin/python
+
 
 import argparse
 from utilities.variables import *
@@ -46,6 +47,9 @@ def main(project_dir):
 
 if __name__ == "__main__":
     # Prompt the user to enter a directory path
+    batch_file = os.path.join(os.getcwd(),'.batch')
+    if os.path.exists(batch_file):
+        os.remove(batch_file)
     input_file = args.i
     project_dir = args.p
     def_path = save_def(input_file, project_dir, 'prepare_esra.txt')
